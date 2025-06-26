@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="notification">
-      <div v-if="isVisible" class="fixed top-4 right-4 z-50 max-w-sm w-full">
+      <div v-if="isVisible" class="fixed top-20 right-4 z-[9999] max-w-sm w-full">
         <div class="bg-white rounded-lg shadow-lg border border-green-200 overflow-hidden">
           <div class="flex items-center p-4">
             <div class="flex-shrink-0">

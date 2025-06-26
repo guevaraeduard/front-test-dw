@@ -93,6 +93,9 @@
 
 <script setup>
 const { cartItems, totalItems, subtotal, savings, shippingCost, taxes, total } = useCart()
+const { user } = useUserAuth()
+const { showError } = useGlobalNotification()
+const router = useRouter()
 
 const couponCode = ref('')
 
@@ -105,9 +108,25 @@ const applyCoupon = () => {
 }
 
 const proceedToCheckout = () => {
-  if (cartItems.length > 0) {
-    // Aquí se redirigiría al checkout
-    alert('Redirigiendo al checkout...')
+  if (cartItems.length === 0) {
+    showError({
+      title: 'Carrito vacío',
+      message: 'Agrega productos al carrito antes de proceder al pago'
+    })
+    return
   }
+
+  if (!user.value) {
+    showError({
+      title: 'Inicia sesión',
+      message: 'Necesitas estar logueado para continuar con la compra'
+    })
+    // Redirigir al login con returnUrl
+    router.push('/login?returnUrl=/checkout')
+    return
+  }
+
+  // Redirigir al checkout
+  router.push('/checkout')
 }
 </script> 

@@ -19,40 +19,34 @@
       </form>
       <p class="mt-4 text-center text-sm">¿Ya tienes cuenta? <NuxtLink to="/login" class="text-blue-600 hover:underline">Inicia sesión</NuxtLink></p>
     </div>
-    <SuccessNotification
-      :is-visible="notification.isVisible.value"
-      :title="notification.title.value"
-      :message="notification.message.value"
-      :duration="notification.duration.value"
-      @close="notification.hideNotification"
-    />
-    <ErrorNotification
-      :is-visible="notification.type.value === 'error' && notification.isVisible.value"
-      :title="notification.title.value"
-      :message="notification.message.value"
-      :duration="notification.duration.value"
-      @close="notification.hideNotification"
-    />
   </div>
 </template>
+
 <script setup>
 import { ref } from 'vue'
 import { useUserAuth } from '~/composables/useUserAuth'
-import { useNotification } from '~/composables/useNotification'
+import { useGlobalNotification } from '~/composables/useGlobalNotification'
+
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const { register } = useUserAuth()
-const notification = useNotification()
+const { showSuccess, showError } = useGlobalNotification()
 const router = useRouter()
 
 const onRegister = async () => {
   try {
     await register({ name: name.value, email: email.value, password: password.value })
-    notification.showSuccess({ title: 'Registro exitoso', message: '¡Bienvenido a TechStore!' })
+    showSuccess({ 
+      title: 'Registro exitoso', 
+      message: '¡Bienvenido a TechStore!' 
+    })
     setTimeout(() => router.push('/user/dashboard'), 1000)
   } catch (e) {
-    notification.showError({ message: e.message })
+    showError({ 
+      title: 'Error de registro',
+      message: e.message 
+    })
   }
 }
 </script> 
