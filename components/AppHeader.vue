@@ -15,7 +15,7 @@
         <div class="flex items-center space-x-4">
           <NuxtLink to="/cart" class="btn-primary">Carrito ({{ totalItems }})</NuxtLink>
           <!-- Acceso de usuario -->
-          <template v-if="user && user.value">
+          <template v-if="user">
             <NuxtLink to="/user/dashboard" class="ml-2 bg-gray-100 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Mi cuenta</NuxtLink>
             <button @click="logoutAndGo" class="ml-2 bg-red-100 text-red-700 px-3 py-2 rounded-lg font-semibold hover:bg-red-200 transition">Cerrar sesión</button>
           </template>
@@ -31,15 +31,14 @@
 
 <script setup>
 import { useCart } from '~/composables/useCart'
-import { useUserAuth } from '~/composables/useUserAuth'
 import { useRouter } from 'vue-router'
 
 const { totalItems } = useCart()
-const { user, logout } = useUserAuth()
+const { clearAuth, user } = useAuth()
 const router = useRouter()
 
 const logoutAndGo = () => {
-  logout()
-  router.push('/')
+  clearAuth()
+  navigateTo('/login')
 }
 </script> 

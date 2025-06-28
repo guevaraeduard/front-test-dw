@@ -15,39 +15,40 @@
       </form>
       <p class="mt-4 text-center text-sm">¿No tienes cuenta? <NuxtLink to="/register" class="text-blue-600 hover:underline">Regístrate</NuxtLink></p>
     </div>
-    <SuccessNotification
-      :is-visible="notification.isVisible.value"
-      :title="notification.title.value"
-      :message="notification.message.value"
-      :duration="notification.duration.value"
-      @close="notification.hideNotification"
-    />
-    <ErrorNotification
-      :is-visible="notification.type.value === 'error' && notification.isVisible.value"
-      :title="notification.title.value"
-      :message="notification.message.value"
-      :duration="notification.duration.value"
-      @close="notification.hideNotification"
-    />
   </div>
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useUserAuth } from '~/composables/useUserAuth'
-import { useNotification } from '~/composables/useNotification'
+import { useAuth } from '~/composables/useAuth'
+import { showToast } from '~/helpers/funtions'    
+import { useApi } from '~/composables/useApi'
+const { guardarData } = useApi();
 const email = ref('')
 const password = ref('')
-const { login } = useUserAuth()
-const notification = useNotification()
-const router = useRouter()
+const { setAuth } = useAuth()
 
 const onLogin = async () => {
+
+  if(email.value === '' || password.value === ''){
+    showToast('Advertencia!', 'Todos los campos son requeridos', 'warning')
+    return
+  }
   try {
-    await login({ email: email.value, password: password.value })
-    notification.showSuccess({ title: 'Bienvenido', message: 'Has iniciado sesión correctamente.' })
-    setTimeout(() => router.push('/user/dashboard'), 1000)
-  } catch (e) {
-    notification.showError({ message: e.message })
+    const response = await guardarData({
+      email: email.value,
+      password: password.value,
+      type: 'user',
+      end_point: 'auth/login',
+    })
+    
+    if(response.operation){
+      setAuth(response.data.access_token, response.data.user)
+      navigateTo('/user/dashboard')
+    } else {
+      showToast('Error!', response.error || 'Error al iniciar sesión', 'error')
+    }
+  } catch (error) {
+    showToast('Error!', 'Error al iniciar sesión', 'error')
   }
 }
 </script> 

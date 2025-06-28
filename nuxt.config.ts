@@ -1,7 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-toast'],
+  runtimeConfig: {
+    // Variables privadas (solo servidor)
+    apiSecret: '',
+    // Variables públicas (cliente y servidor)
+    public: {
+      backendUrl: 'http://localhost:3001/api/',
+    }
+  },
   css: ['~/assets/css/main.css'],
   app: {
     head: {
