@@ -20,7 +20,6 @@
 
 <script setup>
 import { ref } from 'vue'
-<<<<<<< HEAD
 import { useAuth } from '~/composables/useAuth'
 import { showToast } from '~/helpers/funtions'    
 import { useApi } from '~/composables/useApi'
@@ -51,56 +50,6 @@ const onLogin = async () => {
     }
   } catch (error) {
     showToast('Error!', 'Error al iniciar sesión', 'error')
-=======
-import { useUserAuth } from '~/composables/useUserAuth'
-import { useGlobalNotification } from '~/composables/useGlobalNotification'
-import { useRouter, useRoute } from 'vue-router'
-
-const { login } = useUserAuth()
-const { showSuccess, showError } = useGlobalNotification()
-const router = useRouter()
-const route = useRoute()
-
-const formData = ref({
-  email: '',
-  password: ''
-})
-
-const isLoading = ref(false)
-
-const handleSubmit = async () => {
-  if (!formData.value.email || !formData.value.password) {
-    showError({
-      title: 'Campos requeridos',
-      message: 'Por favor completa todos los campos'
-    })
-    return
-  }
-
-  isLoading.value = true
-
-  try {
-    await login(formData.value)
-    showSuccess({
-      title: '¡Bienvenido!',
-      message: 'Has iniciado sesión correctamente'
-    })
-    
-    // Redirigir según el returnUrl o al dashboard por defecto
-    const returnUrl = route.query.returnUrl
-    if (returnUrl) {
-      router.push(returnUrl)
-    } else {
-      router.push('/user/dashboard')
-    }
-  } catch (error) {
-    showError({
-      title: 'Error de autenticación',
-      message: error.message
-    })
-  } finally {
-    isLoading.value = false
->>>>>>> 023067ac934e5b0e49b79984c36d51e7efcdae68
   }
 }
 </script> 
