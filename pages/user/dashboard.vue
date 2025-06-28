@@ -43,7 +43,7 @@ import { useUserAuth } from '~/composables/useUserAuth'
 import { useRouter } from 'vue-router'
 import { useOrders } from '~/composables/useOrders'
 
-definePageMeta({ middleware: 'user-auth-client' })
+definePageMeta({ middleware: 'user-auth' })
 const { user, logout } = useUserAuth()
 const router = useRouter()
 const { getUserOrders } = useOrders()
