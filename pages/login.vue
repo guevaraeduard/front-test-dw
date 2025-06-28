@@ -28,7 +28,7 @@ const email = ref('')
 const password = ref('')
 const { setAuth } = useAuth()
 
-const onLogin = async () => {
+const handleSubmit = async () => {
 
   if(email.value === '' || password.value === ''){
     showToast('Advertencia!', 'Todos los campos son requeridos', 'warning')

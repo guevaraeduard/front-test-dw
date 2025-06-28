@@ -67,20 +67,14 @@
 
 <script setup>
 import { ref } from 'vue'
-<<<<<<< HEAD
 import { useAuth } from '~/composables/useAuth'
 import { useApi } from '~/composables/useApi'
 import { showToast } from '~/helpers/funtions'
 const { guardarData } = useApi();
-=======
-import { useUserAuth } from '~/composables/useUserAuth'
-import { useGlobalNotification } from '~/composables/useGlobalNotification'
->>>>>>> 023067ac934e5b0e49b79984c36d51e7efcdae68
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
-<<<<<<< HEAD
 const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -115,11 +109,6 @@ const validatePassword = (password) => {
             !hasSpecialChar ? 'La contraseña debe contener al menos un carácter especial' : ''
   }
 }
-=======
-const { register } = useUserAuth()
-const { showSuccess, showError } = useGlobalNotification()
-const router = useRouter()
->>>>>>> 023067ac934e5b0e49b79984c36d51e7efcdae68
 
 const onRegister = async () => {
   // Validar que las contraseñas coincidan
