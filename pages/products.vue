@@ -180,7 +180,7 @@
 
 <script setup>
 const { addToCart } = useCart()
-const cartNotification = inject('cartNotification')
+const cartNotification = inject('cartNotification', null)
 
 // Estados para filtros
 const selectedCategories = ref([])

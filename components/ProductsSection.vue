@@ -107,7 +107,7 @@
 
 <script setup>
 const { addToCart } = useCart()
-const cartNotification = inject('cartNotification')
+const cartNotification = inject('cartNotification', null)
 
 // Datos de los productos destacados
 const featuredProducts = [
@@ -117,7 +117,7 @@ const featuredProducts = [
     description: 'RTX 4080 • i9-13900K • 64GB RAM • 2TB NVMe',
     price: 2499,
     originalPrice: 2799,
-    icon: '��'
+    icon: '💻'
   },
   {
     id: 5,
@@ -141,8 +141,8 @@ const featuredProducts = [
 const handleAddToCart = (product) => {
   addToCart(product)
   
-  // Mostrar notificación
-  if (cartNotification.value) {
+  // Mostrar notificación si está disponible
+  if (cartNotification?.value) {
     cartNotification.value.showNotification(product.name)
   }
 }

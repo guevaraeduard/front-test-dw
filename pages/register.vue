@@ -64,16 +64,23 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref } from 'vue'
+<<<<<<< HEAD
 import { useAuth } from '~/composables/useAuth'
 import { useApi } from '~/composables/useApi'
 import { showToast } from '~/helpers/funtions'
 const { guardarData } = useApi();
+=======
+import { useUserAuth } from '~/composables/useUserAuth'
+import { useGlobalNotification } from '~/composables/useGlobalNotification'
+>>>>>>> 023067ac934e5b0e49b79984c36d51e7efcdae68
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
+<<<<<<< HEAD
 const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -108,6 +115,11 @@ const validatePassword = (password) => {
             !hasSpecialChar ? 'La contraseña debe contener al menos un carácter especial' : ''
   }
 }
+=======
+const { register } = useUserAuth()
+const { showSuccess, showError } = useGlobalNotification()
+const router = useRouter()
+>>>>>>> 023067ac934e5b0e49b79984c36d51e7efcdae68
 
 const onRegister = async () => {
   // Validar que las contraseñas coincidan
@@ -135,10 +147,16 @@ const onRegister = async () => {
 /*
   try {
     await register({ name: name.value, email: email.value, password: password.value })
-    notification.showSuccess({ title: 'Registro exitoso', message: '¡Bienvenido a TechStore!' })
+    showSuccess({ 
+      title: 'Registro exitoso', 
+      message: '¡Bienvenido a TechStore!' 
+    })
     setTimeout(() => router.push('/user/dashboard'), 1000)
   } catch (e) {
-    notification.showError({ message: e.message })
+    showError({ 
+      title: 'Error de registro',
+      message: e.message 
+    })
   }
 */
   try {

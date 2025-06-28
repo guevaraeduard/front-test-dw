@@ -210,7 +210,7 @@
 <script setup>
 const route = useRoute()
 const { addToCart } = useCart()
-const cartNotification = inject('cartNotification')
+const cartNotification = inject('cartNotification', null)
 
 // Estado local
 const quantity = ref(1)

@@ -14,15 +14,15 @@
         </div>
       </div>
       <h3 class="text-lg font-semibold mb-2">Mis pedidos</h3>
-      <div v-if="user.orders && user.orders.length">
-        <div v-for="order in user.orders" :key="order.id" class="border rounded-lg p-4 mb-4">
+      <div v-if="userOrders && userOrders.length">
+        <div v-for="order in userOrders" :key="order.id" class="border rounded-lg p-4 mb-4">
           <div class="flex justify-between mb-2">
             <div class="font-semibold">Pedido #{{ order.id }}</div>
-            <div class="text-sm text-gray-500">{{ order.date }}</div>
+            <div class="text-sm text-gray-500">{{ formatDate(order.date) }}</div>
           </div>
           <div class="mb-2">
             <span class="text-sm">Estado: </span>
-            <span class="font-medium" :class="order.status === 'Entregado' ? 'text-green-600' : 'text-yellow-600'">{{ order.status }}</span>
+            <span class="font-medium" :class="getStatusColor(order.status)">{{ order.status }}</span>
           </div>
           <ul class="mb-2">
             <li v-for="item in order.items" :key="item.name" class="text-sm flex justify-between">
@@ -41,13 +41,49 @@
 <script setup>
 import { useUserAuth } from '~/composables/useUserAuth'
 import { useRouter } from 'vue-router'
-definePageMeta({ middleware: 'user-auth' })
+import { useOrders } from '~/composables/useOrders'
+
+definePageMeta({ middleware: 'user-auth-client' })
 const { user, logout } = useUserAuth()
 const router = useRouter()
+const { getUserOrders } = useOrders()
+
 const userInitials = computed(() => {
   if (!user.value) return ''
   return user.value.name.split(' ').map(n => n[0]).join('').toUpperCase()
 })
+
+// Obtener órdenes del usuario
+const userOrders = computed(() => {
+  if (user.value) {
+    return getUserOrders(user.value.email)
+  }
+  return []
+})
+
+// Formatear fecha
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+// Obtener color del estado
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Entregado':
+      return 'text-green-600 bg-green-100'
+    case 'Procesando':
+      return 'text-blue-600 bg-blue-100'
+    case 'Enviado':
+      return 'text-yellow-600 bg-yellow-100'
+    default:
+      return 'text-gray-600 bg-gray-100'
+  }
+}
+
 const logoutAndGo = () => {
   logout()
   router.push('/')
