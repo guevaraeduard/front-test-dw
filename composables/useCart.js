@@ -27,41 +27,17 @@ export const useCart = () => {
   // Estado del carrito usando useState para persistencia
   const cartItems = useState('cartItems', () => {
     // Datos por defecto
-    const defaultCart = [
-      {
-        id: 1,
-        name: 'PC Gaming Elite',
-        description: 'RTX 4080 • i9-13900K • 64GB RAM • 2TB NVMe',
-        price: 2499,
-        originalPrice: 2799,
-        quantity: 1,
-        icon: '💻'
-      },
-      {
-        id: 2,
-        name: 'Monitor 4K Gaming',
-        description: '32" • 4K • 144Hz • HDR • G-Sync',
-        price: 899,
-        originalPrice: null,
-        quantity: 2,
-        icon: '🖥️'
-      },
-      {
-        id: 3,
-        name: 'RTX 4070 Ti',
-        description: '12GB GDDR6X • Ray Tracing • DLSS 3.0',
-        price: 799,
-        originalPrice: 899,
-        quantity: 1,
-        icon: '⚡'
-      }
-    ]
+    const defaultCart = []
 
     // Si estamos en el cliente, intentar cargar desde localStorage
     if (process.client) {
-      const stored = getCartFromStorage()
-      if (stored.length > 0) {
-        return stored
+      try {
+        const stored = getCartFromStorage()
+        if (stored && stored.length > 0) {
+          return stored
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error)
       }
     }
     
@@ -71,9 +47,13 @@ export const useCart = () => {
   // Función para sincronizar con localStorage
   const syncWithStorage = () => {
     if (process.client) {
-      const stored = getCartFromStorage()
-      if (stored.length > 0) {
-        cartItems.value = stored
+      try {
+        const stored = getCartFromStorage()
+        if (stored && stored.length >= 0) {
+          cartItems.value = stored
+        }
+      } catch (error) {
+        console.error('Error syncing cart with localStorage:', error)
       }
     }
   }
@@ -89,8 +69,8 @@ export const useCart = () => {
 
   const savings = computed(() => {
     return cartItems.value.reduce((total, item) => {
-      if (item.originalPrice) {
-        return total + ((item.originalPrice - item.price) * item.quantity)
+      if (item.price_original) {
+        return total + ((item.price_original - item.price) * item.quantity)
       }
       return total
     }, 0)
@@ -110,35 +90,43 @@ export const useCart = () => {
 
   // Funciones para gestionar el carrito
   const addToCart = (product) => {
-    const existingItem = cartItems.value.find(item => item.id === product.id)
+    const existingItem = cartItems.value.find(item => item._id === product._id)
     if (existingItem) {
       existingItem.quantity++
+      // Forzar reactividad actualizando el array
+      cartItems.value = [...cartItems.value]
     } else {
       cartItems.value.push({
         ...product,
         quantity: 1
       })
+      // Forzar reactividad actualizando el array
+      cartItems.value = [...cartItems.value]
     }
     // Guardar en localStorage después de modificar
     saveCartToStorage(cartItems.value)
   }
 
   const removeFromCart = (itemId) => {
-    const index = cartItems.value.findIndex(item => item.id === itemId)
+    const index = cartItems.value.findIndex(item => item._id === itemId)
     if (index > -1) {
       cartItems.value.splice(index, 1)
+      // Forzar reactividad actualizando el array
+      cartItems.value = [...cartItems.value]
       // Guardar en localStorage después de modificar
       saveCartToStorage(cartItems.value)
     }
   }
 
   const updateQuantity = (itemId, quantity) => {
-    const item = cartItems.value.find(item => item.id === itemId)
+    const item = cartItems.value.find(item => item._id === itemId)
     if (item) {
       if (quantity <= 0) {
         removeFromCart(itemId)
       } else {
         item.quantity = quantity
+        // Forzar reactividad actualizando el array
+        cartItems.value = [...cartItems.value]
         // Guardar en localStorage después de modificar
         saveCartToStorage(cartItems.value)
       }
@@ -146,18 +134,22 @@ export const useCart = () => {
   }
 
   const increaseQuantity = (itemId) => {
-    const item = cartItems.value.find(item => item.id === itemId)
+    const item = cartItems.value.find(item => item._id === itemId)
     if (item) {
       item.quantity++
+      // Forzar reactividad actualizando el array
+      cartItems.value = [...cartItems.value]
       // Guardar en localStorage después de modificar
       saveCartToStorage(cartItems.value)
     }
   }
 
   const decreaseQuantity = (itemId) => {
-    const item = cartItems.value.find(item => item.id === itemId)
+    const item = cartItems.value.find(item => item._id === itemId)
     if (item && item.quantity > 1) {
       item.quantity--
+      // Forzar reactividad actualizando el array
+      cartItems.value = [...cartItems.value]
       // Guardar en localStorage después de modificar
       saveCartToStorage(cartItems.value)
     }

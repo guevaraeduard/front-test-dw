@@ -17,8 +17,8 @@
       <div v-if="userOrders && userOrders.length">
         <div v-for="order in userOrders" :key="order.id" class="border rounded-lg p-4 mb-4">
           <div class="flex justify-between mb-2">
-            <div class="font-semibold">Pedido #{{ order.id }}</div>
-            <div class="text-sm text-gray-500">{{ formatDate(order.date) }}</div>
+            <div class="font-semibold">Pedido #{{ order._id }}</div>
+            <div class="text-sm text-gray-500">{{ formatDate(order.createdAt) }}</div>
           </div>
           <div class="mb-2">
             <span class="text-sm">Estado: </span>
@@ -39,14 +39,12 @@
   </div>
 </template>
 <script setup>
-import { useUserAuth } from '~/composables/useUserAuth'
-import { useRouter } from 'vue-router'
-import { useOrders } from '~/composables/useOrders'
 
-definePageMeta({ middleware: 'user-auth' })
-const { user, logout } = useUserAuth()
-const router = useRouter()
-const { getUserOrders } = useOrders()
+import { useAuth } from '~/composables/useAuth'
+definePageMeta({ middleware: ['user-auth', 'verify-role-user'] })
+const { getResultDataGet } = useApi()
+const { clearAuth, user } = useAuth()
+
 
 const userInitials = computed(() => {
   if (!user.value) return ''
@@ -54,12 +52,7 @@ const userInitials = computed(() => {
 })
 
 // Obtener órdenes del usuario
-const userOrders = computed(() => {
-  if (user.value) {
-    return getUserOrders(user.value.email)
-  }
-  return []
-})
+const userOrders = ref([])
 
 // Formatear fecha
 const formatDate = (dateString) => {
@@ -85,7 +78,20 @@ const getStatusColor = (status) => {
 }
 
 const logoutAndGo = () => {
-  logout()
-  router.push('/')
+  clearAuth()
+  navigateTo('/')
 }
+
+const getOrders = async () => {
+  const response = await getResultDataGet({
+    end_point: 'pedidos/user',
+  })
+  console.log(response)
+  if (response.operation) {
+    userOrders.value = response.data
+  }
+}
+onMounted(async () => {
+  await getOrders()
+})
 </script> 

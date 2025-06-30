@@ -18,7 +18,7 @@
               <p class="text-xs text-gray-600">{{ user?.email }}</p>
             </div>
             <button 
-              @click="logout"
+              @click="logoutAndGo"
               class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Cerrar Sesión
@@ -120,7 +120,7 @@
         </NuxtLink>
 
         <NuxtLink 
-          to="/admin/reports"
+          to="/admin/dashboard"
           class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-red-200"
         >
           <div class="flex items-center mb-4">
@@ -131,7 +131,7 @@
         </NuxtLink>
 
         <NuxtLink 
-          to="/admin/settings"
+          to="/admin/dashboard"
           class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-gray-200"
         >
           <div class="flex items-center mb-4">
@@ -167,11 +167,11 @@
 <script setup>
 // Middleware de autenticación
 definePageMeta({
-  middleware: 'auth-client'
+  middleware: ['user-auth', 'verify-role-admin']
 })
 
 // Composable de autenticación
-const { user, logout } = useAdminAuth()
+const { clearAuth, user } = useAuth()
 
 // Meta tags
 useHead({
@@ -220,4 +220,9 @@ const recentActivity = ref([
     time: 'Hace 8 horas'
   }
 ])
+
+const logoutAndGo = () => {
+  clearAuth()
+  navigateTo('/')
+}
 </script> 

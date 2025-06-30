@@ -11,12 +11,146 @@ export const useOrders = () => {
     if (process.client) {
       try {
         const stored = localStorage.getItem(ORDERS_KEY)
-        orders.value = stored ? JSON.parse(stored) : []
+        if (stored) {
+          orders.value = JSON.parse(stored)
+        } else {
+          // Agregar pedidos de ejemplo si no hay ninguno
+          orders.value = getSampleOrders()
+          saveOrders()
+        }
       } catch (error) {
         console.error('Error loading orders:', error)
-        orders.value = []
+        orders.value = getSampleOrders()
       }
     }
+  }
+
+  // Pedidos de ejemplo
+  const getSampleOrders = () => {
+    return [
+      {
+        id: 1001,
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 días atrás
+        status: 'Entregado',
+        customerName: 'María González',
+        customerEmail: 'maria.gonzalez@email.com',
+        customerPhone: '+34 612 345 678',
+        shippingAddress: {
+          address: 'Calle Mayor 123',
+          city: 'Madrid',
+          postalCode: '28001',
+          country: 'España'
+        },
+        items: [
+          {
+            id: 1,
+            name: 'PC Gaming Elite',
+            price: 1299.99,
+            quantity: 1,
+            image: '/images/placeholder-product.svg'
+          },
+          {
+            id: 2,
+            name: 'Monitor 4K Gaming',
+            price: 449.99,
+            quantity: 1,
+            image: '/images/placeholder-product.svg'
+          }
+        ],
+        subtotal: 1749.98,
+        shipping: 15.00,
+        tax: 87.50,
+        total: 1852.48
+      },
+      {
+        id: 1002,
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 día atrás
+        status: 'Enviado',
+        customerName: 'Carlos Rodríguez',
+        customerEmail: 'carlos.rodriguez@email.com',
+        customerPhone: '+34 623 456 789',
+        shippingAddress: {
+          address: 'Avenida Diagonal 456',
+          city: 'Barcelona',
+          postalCode: '08013',
+          country: 'España'
+        },
+        items: [
+          {
+            id: 3,
+            name: 'Laptop Ultrabook Pro',
+            price: 899.99,
+            quantity: 1,
+            image: '/images/placeholder-product.svg'
+          }
+        ],
+        subtotal: 899.99,
+        shipping: 12.00,
+        tax: 45.00,
+        total: 956.99
+      },
+      {
+        id: 1003,
+        date: new Date().toISOString(), // Hoy
+        status: 'Procesando',
+        customerName: 'Ana Martínez',
+        customerEmail: 'ana.martinez@email.com',
+        customerPhone: '+34 634 567 890',
+        shippingAddress: {
+          address: 'Plaza España 789',
+          city: 'Sevilla',
+          postalCode: '41013',
+          country: 'España'
+        },
+        items: [
+          {
+            id: 4,
+            name: 'Tablet Pro Max',
+            price: 299.99,
+            quantity: 2,
+            image: '/images/placeholder-product.svg'
+          },
+          {
+            id: 5,
+            name: 'Auriculares Wireless',
+            price: 89.99,
+            quantity: 1,
+            image: '/images/placeholder-product.svg'
+          }
+        ],
+        subtotal: 689.97,
+        shipping: 10.00,
+        tax: 34.50,
+        total: 734.47
+      },
+      {
+        id: 1004,
+        date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 días atrás
+        status: 'Cancelado',
+        customerName: 'Luis Fernández',
+        customerEmail: 'luis.fernandez@email.com',
+        customerPhone: '+34 645 678 901',
+        shippingAddress: {
+          address: 'Calle Gran Vía 321',
+          city: 'Valencia',
+          postalCode: '46004',
+          country: 'España'
+        },
+        items: [
+          {
+            id: 6,
+            name: 'Smartphone Galaxy S23',
+            price: 799.99,
+            quantity: 1,
+            image: '/images/placeholder-product.svg'
+          }
+        ],
+        subtotal: 799.99,
+        shipping: 8.00,
+        tax: 40.00,
+        total: 847.99
+      }
+    ]
   }
 
   // Guardar órdenes en localStorage

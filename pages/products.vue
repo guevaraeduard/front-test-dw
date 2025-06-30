@@ -4,8 +4,11 @@
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center space-x-4 mb-4">
-          <NuxtLink to="/" class="text-blue-600 hover:text-blue-800 transition-colors">
-            ← Volver a Inicio
+          <NuxtLink to="/" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Volver a Inicio
           </NuxtLink>
         </div>
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Todos los Productos</h1>
@@ -22,14 +25,14 @@
             <div class="mb-6">
               <h3 class="text-sm font-medium text-gray-700 mb-3">Categoría</h3>
               <div class="space-y-2">
-                <label v-for="category in categories" :key="category.slug" class="flex items-center">
+                <label v-for="category in categories" :key="category._id" class="flex items-center">
                   <input 
                     type="checkbox" 
-                    :value="category.slug"
+                    :value="category._id"
                     v-model="selectedCategories"
                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   >
-                  <span class="ml-2 text-sm text-gray-700">{{ category.name }}</span>
+                  <span class="ml-2 text-sm text-gray-700 capitalize">{{ category.name }}</span>
                 </label>
               </div>
             </div>
@@ -128,16 +131,21 @@
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <div 
               v-for="product in filteredProducts" 
-              :key="product.id" 
+              :key="product._id" 
               class="card overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
               @click="navigateToProduct(product)"
             >
               <div class="bg-gray-200 h-48 flex items-center justify-center">
-                <div class="text-6xl">{{ product.icon }}</div>
+                <img 
+                  :src="product.image || '/images/placeholder-product.jpg'" 
+                  :alt="product.name"
+                  class="w-full h-full object-cover"
+                  @error="$event.target.src = '/images/placeholder-product.jpg'"
+                >
               </div>
               <div class="p-6">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full capitalize">
                     {{ getCategoryName(product.category) }}
                   </span>
                   <span v-if="product.stock < 5" class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
@@ -149,7 +157,7 @@
                 <div class="flex items-center justify-between mb-4">
                   <div>
                     <span class="text-xl font-bold text-blue-600">${{ product.price }}</span>
-                    <span v-if="product.originalPrice" class="text-sm text-gray-500 line-through ml-2">${{ product.originalPrice }}</span>
+                    <span v-if="product.price_original" class="text-sm text-gray-500 line-through ml-2">${{ product.price_original }}</span>
                   </div>
                 </div>
                 <button 
@@ -180,6 +188,8 @@
 
 <script setup>
 const { addToCart } = useCart()
+const { getResultDataGet } = useApi()
+
 const cartNotification = inject('cartNotification', null)
 
 // Estados para filtros
@@ -189,188 +199,18 @@ const inStockOnly = ref(false)
 const sortBy = ref('name')
 
 // Categorías disponibles
-const categories = [
-  { slug: 'pcs-completas', name: 'PCs Completas' },
-  { slug: 'monitores', name: 'Monitores' },
-  { slug: 'componentes', name: 'Componentes' },
-  { slug: 'perifericos', name: 'Periféricos' }
-]
+const categories = ref([])
 
 // Todos los productos
-const allProducts = [
-  // PCs Completas
-  {
-    id: 1,
-    name: 'PC Gaming Elite',
-    description: 'RTX 4080 • i9-13900K • 64GB RAM • 2TB NVMe',
-    price: 2499,
-    originalPrice: 2799,
-    stock: 5,
-    icon: '💻',
-    category: 'pcs-completas'
-  },
-  {
-    id: 2,
-    name: 'PC Gaming Pro',
-    description: 'RTX 4070 • Ryzen 7 7700X • 32GB RAM • 1TB NVMe',
-    price: 1299,
-    originalPrice: null,
-    stock: 8,
-    icon: '💻',
-    category: 'pcs-completas'
-  },
-  {
-    id: 3,
-    name: 'PC Oficina',
-    description: 'Intel i5 • 16GB RAM • 512GB SSD • Sin GPU',
-    price: 599,
-    originalPrice: 699,
-    stock: 12,
-    icon: '💻',
-    category: 'pcs-completas'
-  },
-  {
-    id: 4,
-    name: 'PC Diseño',
-    description: 'RTX 4060 • i7-13700K • 32GB RAM • 2TB NVMe',
-    price: 1499,
-    originalPrice: null,
-    stock: 3,
-    icon: '💻',
-    category: 'pcs-completas'
-  },
-  // Monitores
-  {
-    id: 5,
-    name: 'Monitor 4K Gaming',
-    description: '32" • 4K • 144Hz • HDR • G-Sync',
-    price: 899,
-    originalPrice: null,
-    stock: 7,
-    icon: '🖥️',
-    category: 'monitores'
-  },
-  {
-    id: 6,
-    name: 'Monitor Curvo Gaming',
-    description: '27" • 1440p • 165Hz • Curvo • FreeSync',
-    price: 399,
-    originalPrice: 499,
-    stock: 15,
-    icon: '🖥️',
-    category: 'monitores'
-  },
-  {
-    id: 7,
-    name: 'Monitor Profesional',
-    description: '27" • 4K • 60Hz • Color Calibrated',
-    price: 699,
-    originalPrice: null,
-    stock: 4,
-    icon: '🖥️',
-    category: 'monitores'
-  },
-  {
-    id: 8,
-    name: 'Monitor Ultrawide',
-    description: '34" • 1440p • 100Hz • 21:9 • HDR',
-    price: 599,
-    originalPrice: 749,
-    stock: 6,
-    icon: '🖥️',
-    category: 'monitores'
-  },
-  // Componentes
-  {
-    id: 9,
-    name: 'RTX 4070 Ti',
-    description: '12GB GDDR6X • Ray Tracing • DLSS 3.0',
-    price: 799,
-    originalPrice: 899,
-    stock: 10,
-    icon: '⚡',
-    category: 'componentes'
-  },
-  {
-    id: 10,
-    name: 'Ryzen 7 7700X',
-    description: '8 Cores • 16 Threads • 4.5GHz • AM5',
-    price: 349,
-    originalPrice: null,
-    stock: 20,
-    icon: '⚡',
-    category: 'componentes'
-  },
-  {
-    id: 11,
-    name: 'RAM DDR5 32GB',
-    description: '32GB • 6000MHz • CL36 • Dual Channel',
-    price: 129,
-    originalPrice: 159,
-    stock: 25,
-    icon: '⚡',
-    category: 'componentes'
-  },
-  {
-    id: 12,
-    name: 'SSD NVMe 2TB',
-    description: '2TB • PCIe 4.0 • 7000MB/s • NVMe',
-    price: 149,
-    originalPrice: null,
-    stock: 18,
-    icon: '⚡',
-    category: 'componentes'
-  },
-  // Periféricos
-  {
-    id: 13,
-    name: 'Teclado Mecánico RGB',
-    description: 'Switches Cherry MX • RGB • Wrist Rest',
-    price: 129,
-    originalPrice: 159,
-    stock: 30,
-    icon: '🎮',
-    category: 'perifericos'
-  },
-  {
-    id: 14,
-    name: 'Mouse Gaming',
-    description: '25K DPI • RGB • 7 Botones • Wireless',
-    price: 79,
-    originalPrice: null,
-    stock: 22,
-    icon: '🎮',
-    category: 'perifericos'
-  },
-  {
-    id: 15,
-    name: 'Headset Gaming',
-    description: '7.1 Surround • Mic • RGB • Comfort',
-    price: 89,
-    originalPrice: 119,
-    stock: 16,
-    icon: '🎮',
-    category: 'perifericos'
-  },
-  {
-    id: 16,
-    name: 'Mousepad RGB',
-    description: 'XXL • RGB • Anti-slip • Gaming',
-    price: 39,
-    originalPrice: null,
-    stock: 35,
-    icon: '🎮',
-    category: 'perifericos'
-  }
-]
+const allProducts = ref([])
 
 // Computed properties
 const filteredProducts = computed(() => {
-  let filtered = [...allProducts]
+  let filtered = [...(allProducts.value || [])]
 
   // Filtro por categoría
   if (selectedCategories.value.length > 0) {
-    filtered = filtered.filter(product => selectedCategories.value.includes(product.category))
+    filtered = filtered.filter(product => selectedCategories.value.includes(product.category._id))
   }
 
   // Filtro por precio
@@ -409,8 +249,9 @@ const filteredProducts = computed(() => {
 
 // Funciones
 const getCategoryName = (categorySlug) => {
-  const category = categories.find(cat => cat.slug === categorySlug)
-  return category ? category.name : categorySlug
+  
+  const category = (categories.value || []).find(cat => cat._id == categorySlug._id)
+  return category ? category.name : ''
 }
 
 const clearFilters = () => {
@@ -430,7 +271,7 @@ const handleAddToCart = (product) => {
 }
 
 const navigateToProduct = (product) => {
-  navigateTo(`/product/${product.id}`)
+  navigateTo(`/product/${product._id}`)
 }
 
 // Meta tags
@@ -439,5 +280,21 @@ useHead({
   meta: [
     { name: 'description', content: 'Explora nuestra completa colección de productos de tecnología. PCs, monitores, componentes y periféricos.' }
   ]
+})
+
+const getProducts = async () => {
+
+const response = await getResultDataGet({
+  end_point: 'frontend/products-categories',
+})
+console.log(response)
+if (response.operation) {
+  categories.value = response.data.categories
+  allProducts.value = response.data.products
+}
+}
+
+onMounted(async () => {
+  await getProducts()
 })
 </script> 

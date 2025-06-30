@@ -61,6 +61,34 @@ export const useApi = () => {
         }
     };
 
+    const deleteData = async (form) => {
+        try {
+            const response = await baseApi.delete(form.end_point);
+            return {
+                operation: true,
+                error: null,
+                data: response.data,
+            };
+        } catch (error) {
+            if (error?.response?.data.message) {
+                let message = error.response.data.message;
+                if (Array.isArray(message)) {
+                    message = message[0];
+                }
+                return {
+                    operation: false,
+                    error: message,
+                    data: null
+                };
+            }
+            return {
+                operation: false,
+                error: 'An unexpected error occurred',
+                data: error
+            };
+        }
+    };
+
     const getResultDataGet = async (form, page) => {
         try {
             const url = page ? `${form.end_point}?page=${page}` : form.end_point;
@@ -118,10 +146,40 @@ export const useApi = () => {
         }
     };
 
+    const updateData = async (form) => {
+        try {
+            const response = await baseApi.patch(form.end_point, form);
+            return {
+                operation: true,
+                error: null,
+                data: response.data,
+            };
+        } catch (error) {
+            if (error?.response?.data.error === 'Payload Too Large') {
+                return {
+                    operation: false,
+                    error: 'El archivo es demasiado grande',
+                    data: null
+                };
+            }
+            let message = error?.response?.data.message;
+            if (Array.isArray(message)) {
+                message = message[0];
+            }
+            return {
+                operation: false,
+                error: message || 'An unexpected error occurred',
+                data: null
+            };
+        }
+    };
+
     return {
         getResultDataGet,
         guardarDataFile,
         guardarData,
         backendUrl,
+        deleteData,
+        updateData
     };
 }; 

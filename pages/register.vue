@@ -69,7 +69,7 @@
 import { ref } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useApi } from '~/composables/useApi'
-import { showToast } from '~/helpers/funtions'
+import { showToast, validatePassword, validateEmail } from '~/helpers/funtions'
 const { guardarData } = useApi();
 
 const name = ref('')
@@ -88,27 +88,6 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-const validateEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
-
-const validatePassword = (password) => {
-  const hasUpperCase = /[A-Z]/.test(password)
-  const hasLowerCase = /[a-z]/.test(password)
-  const hasNumber = /[0-9]/.test(password)
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
-  const isLongEnough = password.length >= 8
-
-  return {
-    isValid: hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isLongEnough,
-    message: !isLongEnough ? 'La contraseña debe tener al menos 8 caracteres' :
-      !hasUpperCase ? 'La contraseña debe contener al menos una letra mayúscula' :
-        !hasLowerCase ? 'La contraseña debe contener al menos una letra minúscula' :
-          !hasNumber ? 'La contraseña debe contener al menos un número' :
-            !hasSpecialChar ? 'La contraseña debe contener al menos un carácter especial' : ''
-  }
-}
 
 const onRegister = async () => {
   // Validar que las contraseñas coincidan
@@ -133,21 +112,7 @@ const onRegister = async () => {
     showToast('Error', 'Las contraseñas no coinciden', 'error')
     return
   }
-/*
-  try {
-    await register({ name: name.value, email: email.value, password: password.value })
-    showSuccess({ 
-      title: 'Registro exitoso', 
-      message: '¡Bienvenido a TechStore!' 
-    })
-    setTimeout(() => router.push('/user/dashboard'), 1000)
-  } catch (e) {
-    showError({ 
-      title: 'Error de registro',
-      message: e.message 
-    })
-  }
-*/
+
   try {
     const response = await guardarData({
       name: name.value,

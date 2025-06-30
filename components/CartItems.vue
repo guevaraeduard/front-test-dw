@@ -5,11 +5,16 @@
       
       <!-- Lista de productos -->
       <div v-if="cartItems.length > 0" class="space-y-6">
-        <div v-for="item in cartItems" :key="item.id" class="flex items-center space-x-4 p-4 border rounded-lg">
+        <div v-for="item in cartItems" :key="item._id" class="flex items-center space-x-4 p-4 border rounded-lg">
           <!-- Imagen del producto -->
           <div class="flex-shrink-0">
-            <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-              <div class="text-2xl">{{ item.icon }}</div>
+            <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+              <img 
+                :src="item.image || '/images/placeholder-product.svg'" 
+                :alt="item.name"
+                class="w-full h-full object-cover"
+                @error="$event.target.src = '/images/placeholder-product.svg'"
+              />
             </div>
           </div>
           
@@ -26,14 +31,14 @@
           <!-- Controles de cantidad -->
           <div class="flex items-center space-x-2">
             <button 
-              @click="decreaseQuantity(item.id)"
+              @click="decreaseQuantity(item._id)"
               class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
               -
             </button>
             <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
             <button 
-              @click="increaseQuantity(item.id)"
+              @click="increaseQuantity(item._id)"
               class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
               +
@@ -47,7 +52,7 @@
           
           <!-- Botón eliminar -->
           <button 
-            @click="removeFromCart(item.id)"
+            @click="removeFromCart(item._id)"
             class="text-red-500 hover:text-red-700 transition-colors"
           >
             🗑️

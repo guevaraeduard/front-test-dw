@@ -53,7 +53,7 @@
               <textarea rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
             </div>
             
-            <button type="submit" class="btn-primary w-full">Enviar Mensaje</button>
+            <button type="submit" disabled class="btn-primary w-full">Enviar Mensaje</button>
           </form>
         </div>
       </div>

@@ -6,7 +6,7 @@
           <NuxtLink to="/" class="text-2xl font-bold text-blue-600">TechStore</NuxtLink>
         </div>
         <div class="hidden md:flex items-center space-x-8">
-          <a href="#inicio" class="text-gray-700 hover:text-blue-600 transition-colors">Inicio</a>
+          <NuxtLink to="/" class="text-gray-700 hover:text-blue-600 transition-colors">Inicio</NuxtLink>
           <NuxtLink to="/products" class="text-gray-700 hover:text-blue-600 transition-colors">Productos</NuxtLink>
           <a href="#ofertas" class="text-gray-700 hover:text-blue-600 transition-colors">Ofertas</a>
           <a href="#contacto" class="text-gray-700 hover:text-blue-600 transition-colors">Contacto</a>
@@ -16,7 +16,7 @@
           <NuxtLink to="/cart" class="btn-primary">Carrito ({{ totalItems }})</NuxtLink>
           <!-- Acceso de usuario -->
           <template v-if="user">
-            <NuxtLink to="/user/dashboard" class="ml-2 bg-gray-100 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Mi cuenta</NuxtLink>
+            <NuxtLink :to="user.role == 'user' ? '/user/dashboard' : '/admin/dashboard'" class="ml-2 bg-gray-100 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Mi cuenta</NuxtLink>
             <button @click="logoutAndGo" class="ml-2 bg-red-100 text-red-700 px-3 py-2 rounded-lg font-semibold hover:bg-red-200 transition">Cerrar sesión</button>
           </template>
           <template v-else>
@@ -30,12 +30,8 @@
 </template>
 
 <script setup>
-import { useCart } from '~/composables/useCart'
-import { useRouter } from 'vue-router'
-
 const { totalItems } = useCart()
 const { clearAuth, user } = useAuth()
-const router = useRouter()
 
 const logoutAndGo = () => {
   clearAuth()

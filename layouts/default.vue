@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <AppHeader />
+    <AppHeader v-if="route.path != '/admin/dashboard' && route.path != '/admin/categories' && route.path != '/admin/orders' && route.path != '/admin/products' && route.path != '/admin/users' "/>
     
     <!-- Main Content -->
     <main class="flex-1">
@@ -38,6 +38,9 @@
 // Layout logic can be added here
 const cartNotification = ref(null)
 const { isVisible, title, message, duration, type, hideNotification } = useGlobalNotification()
+
+// Obtener la ruta actual
+const route = useRoute()
 
 // Exponer la referencia para que otros componentes la usen
 provide('cartNotification', cartNotification)
